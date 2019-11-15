@@ -13,7 +13,7 @@ import axios from 'axios'
 const UpdateMovie = props => {
     const [movie, setMovie] = useState(props.location.state.movie || {})
     const [metascore, setMetascore] = useState(0)
-    const [stars, setStars] = useState(props.location.state.movie.stars)
+    const [star, setStar] = useState("")
 
     const handleTitleChange = e => {
         setMovie({ ...movie, title: e.target.value })
@@ -27,8 +27,13 @@ const UpdateMovie = props => {
         setMovie({ ...movie, metascore: Number(e.target.textContent) })
     }
 
-    const handleStarsChange = e => {
-        setStars(e.target.value.split(' ').join())
+    const handleStarChange = e => {
+        setStar(e.target.value)
+    }
+
+    const handleAddStar = () => {
+        setMovie({ ...movie, stars: [...movie.stars, star]})
+        setStar('')
     }
 
     const handleUpdateMovie = e => {
@@ -40,6 +45,14 @@ const UpdateMovie = props => {
             .catch(err => {
                 console.log(err)
             })
+    }
+
+    const deleteStar = name => {
+        setMovie({...movie, stars: [...movie.stars.filter(x => !(x === name))]})
+    }
+
+    const handleCancel = () => {
+        props.history.push(`/movies/${movie.id}`)
     }
 
     const useStyles = makeStyles(theme => ({
@@ -85,12 +98,24 @@ const UpdateMovie = props => {
             />
             <Typography id="stars-list">Movie Stars</Typography>
             <List>
-                {stars.map(star => <ListItem><ListItemText>{star}</ListItemText></ListItem>)}
+                {movie.stars.map(star => 
+                <ListItem>
+                    <ListItemText>
+                        {star}
+                        <button onClick={() => deleteStar(star)}> X </button>
+                    </ListItemText>
+                </ListItem>)}
             </List>
-            <Button variant='contained' color='primary'>Add Star</Button>
-            <Button variant='contained' color='secondary'>Remove Star</Button>
+            <TextField
+                id="star-name"
+                label="stars"
+                onChange={handleStarChange}
+                margin="normal"
+                variant="outlined"
+            />
+            <Button variant='contained' color='primary' onClick={handleAddStar}>Add Star</Button>
             <Button variant='contained' color='primary' onClick={(e) => handleUpdateMovie(e)}>Update</Button>
-            <Button variant='contained' color='secondary'>Cancel</Button>
+            <Button variant='contained' color='secondary' onClick={handleCancel}>Cancel</Button>
         </div>
     );
 };
